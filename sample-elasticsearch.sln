@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30105.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Elasticsearch.WebApi", "src\Sample.Elasticsearch.WebApi\Sample.Elasticsearch.WebApi.csproj", "{2CAF22E2-6510-4B11-8F5F-89E0A3C05010}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{18F6D3A5-091F-4A10-B5BC-57E2239C80D6}"
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "src\docker-compose.dcproj", "{18F6D3A5-091F-4A10-B5BC-57E2239C80D6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{1F4C7FFA-7156-4355-A604-34293A63EDB1}"
 EndProject
