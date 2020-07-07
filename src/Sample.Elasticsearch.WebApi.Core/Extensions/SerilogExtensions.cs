@@ -3,6 +3,7 @@ using Elastic.CommonSchema.Serilog;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Exceptions;
+using Serilog.Filters;
 using Serilog.Sinks.Elasticsearch;
 
 namespace Sample.Elasticsearch.WebApi.Core.Extensions
@@ -13,12 +14,14 @@ namespace Sample.Elasticsearch.WebApi.Core.Extensions
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
+                .Enrich.WithProperty("ApplicationName", "API Exemplo Elasticsearch")
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentUserName()
                 .Enrich.WithExceptionDetails()
                 .WriteTo.LiterateConsole()
                 .WriteTo.Debug()
+                //.Filter.ByExcluding(Matching.FromSource("Microsoft.AspNetCore.StaticFiles"))
                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["ElasticsearchSettings:uri"]))
                 {
                     AutoRegisterTemplate = true,
