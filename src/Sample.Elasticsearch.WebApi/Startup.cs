@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sample.Elasticsearch.WebApi.Core.Extensions;
+using System.IO.Compression;
 
 namespace Sample.Elasticsearch.WebApi
 {
@@ -23,6 +25,12 @@ namespace Sample.Elasticsearch.WebApi
             services.AddElasticsearch(Configuration);
             services.AddServices();
             services.AddSwagger(Configuration);
+
+            services.AddResponseCompression();
+            services.Configure<GzipCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.Optimal;
+            });
 
             services.AddControllers();
         }
