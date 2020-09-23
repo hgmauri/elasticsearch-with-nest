@@ -21,7 +21,7 @@ namespace Sample.Elasticsearch.WebApi.Core.Extensions
                 .Enrich.WithExceptionDetails()
                 .WriteTo.LiterateConsole()
                 .WriteTo.Debug()
-                //.Filter.ByExcluding(Matching.FromSource("Microsoft.AspNetCore.StaticFiles"))
+                .Filter.ByExcluding(Matching.FromSource("Microsoft.AspNetCore.StaticFiles"))
                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["ElasticsearchSettings:uri"]))
                 {
                     AutoRegisterTemplate = true,

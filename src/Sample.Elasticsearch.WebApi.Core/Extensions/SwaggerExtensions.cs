@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Sample.Elasticsearch.Domain.Application;
-using Sample.Elasticsearch.Domain.Concrete;
 
 namespace Sample.Elasticsearch.WebApi.Core.Extensions
 {
