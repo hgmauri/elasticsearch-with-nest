@@ -1,10 +1,14 @@
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sample.Elasticsearch.WebApi.Core.Extensions;
+using Sample.Elasticsearch.WebApi.Core.Middleware;
+using Serilog;
 using System.IO.Compression;
 
 namespace Sample.Elasticsearch.WebApi
@@ -25,6 +29,7 @@ namespace Sample.Elasticsearch.WebApi
             services.AddElasticsearch(Configuration);
             services.AddServices();
             services.AddSwagger(Configuration);
+            services.AddHeathCheckApi(Configuration);
 
             services.AddResponseCompression();
             services.Configure<GzipCompressionProviderOptions>(options =>
@@ -42,6 +47,11 @@ namespace Sample.Elasticsearch.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogEnricherExtensions.EnrichFromRequest);
+
+            app.UseMiddleware<RequestSerilLogMiddleware>();
+            app.UseMiddleware<ErrorHandlingMiddleware>();
+                
             app.UseSwaggerDoc();
 
             app.UseHttpsRedirection();
@@ -50,9 +60,17 @@ namespace Sample.Elasticsearch.WebApi
 
             app.UseAuthorization();
 
+            app.UseHealthCheckApi();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/hc",
+                    new HealthCheckOptions
+                    {
+                        Predicate = _ => true,
+                        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
+                    });
             });
         }
     }
