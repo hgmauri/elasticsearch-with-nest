@@ -25,7 +25,7 @@ namespace Sample.Elasticsearch.WebApi.Core.Extensions
                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["ElasticsearchSettings:uri"]))
                 {
                     AutoRegisterTemplate = true,
-                    IndexFormat = "logs",
+                    IndexFormat = "indexlogs",
                     ModifyConnectionSettings = x => x.BasicAuthentication(configuration["ElasticsearchSettings:username"], configuration["ElasticsearchSettings:password"])
                 })
                 .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")

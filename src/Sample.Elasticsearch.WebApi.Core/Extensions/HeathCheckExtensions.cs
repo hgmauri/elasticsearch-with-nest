@@ -27,7 +27,7 @@ namespace Sample.Elasticsearch.WebApi.Core.Extensions
             {
                 config.SetEvaluationTimeInSeconds(5);
                 config.AddHealthCheckEndpoint("Host Externo", ObterHostNameApiHealthCheck());
-                config.AddHealthCheckEndpoint("Aplicação", $"http://localhost:5001/hc");
+                config.AddHealthCheckEndpoint("Aplicação", $"https://localhost:5001/hc");
 
                 config.AddWebhookNotification("Slack Notification WebHook", "Your_Slack_WebHook_Uri_Goes_Here",
                                             "{\"text\": \"[[LIVENESS]] is failing with the error message : [[FAILURE]]\"}",
@@ -46,7 +46,7 @@ namespace Sample.Elasticsearch.WebApi.Core.Extensions
 
         public static string ObterHostNameApiHealthCheck()
         {
-            var tt = Environment.GetEnvironmentVariable("HostNameHealthCheck") == null ? "/api/hc" : $"{Environment.GetEnvironmentVariable("HostNameHealthCheck")}/api/hc";
+            var tt = Environment.GetEnvironmentVariable("HostNameHealthCheck") == null ? "/hc" : $"{Environment.GetEnvironmentVariable("HostNameHealthCheck")}/hc";
             return tt;
         }
     }
