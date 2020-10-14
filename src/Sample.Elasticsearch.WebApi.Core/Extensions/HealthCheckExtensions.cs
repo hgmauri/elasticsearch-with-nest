@@ -4,14 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Sample.Elasticsearch.WebApi.Core.HealthCheck;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Sample.Elasticsearch.WebApi.Core.Extensions
 {
-    public static class HeathCheckExtensions
+    public static class HealthCheckExtensions
     {
-        public static void AddHeathCheckApi(this IServiceCollection services, IConfiguration configuration)
+        public static void AddHealthCheckApi(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddHealthChecks()
                 .AddCheck("Situação", () => HealthCheckResult.Unhealthy())

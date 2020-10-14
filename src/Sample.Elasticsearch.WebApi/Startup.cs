@@ -29,7 +29,7 @@ namespace Sample.Elasticsearch.WebApi
             services.AddElasticsearch(Configuration);
             services.AddServices();
             services.AddSwagger(Configuration);
-            services.AddHeathCheckApi(Configuration);
+            services.AddHealthCheckApi(Configuration);
 
             services.AddResponseCompression();
             services.Configure<GzipCompressionProviderOptions>(options =>
