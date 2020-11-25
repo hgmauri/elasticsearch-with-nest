@@ -5,6 +5,7 @@ using Nest;
 using Sample.Elasticsearch.Domain.Concrete;
 using Sample.Elasticsearch.Domain.Indices;
 using Sample.Elasticsearch.Domain.Model;
+using static System.Int32;
 
 namespace Sample.Elasticsearch.Domain.Application
 {
@@ -19,14 +20,14 @@ namespace Sample.Elasticsearch.Domain.Application
 
         public void PostActorsSample()
         {
+            var descriptor = new BulkDescriptor();
+
             if (!_elasticClient.Indices.Exists(nameof(IndexActors).ToLower()).Exists)
                 _elasticClient.Indices.Create(nameof(IndexActors).ToLower());
 
             _elasticClient.IndexMany<IndexActors>(IndexActors.GetSampleData());
 
-            #region
-            var descriptor = new BulkDescriptor();
-
+            //or
             descriptor.UpdateMany<IndexActors>(IndexActors.GetSampleData(), (b, u) => b
                 .Index(nameof(IndexActors).ToLower())
                 .Doc(u)
@@ -36,16 +37,17 @@ namespace Sample.Elasticsearch.Domain.Application
 
             if (!insert.IsValid)
                 throw new Exception(insert.OriginalException.ToString());
-            #endregion
         }
 
         public ICollection<IndexActors> GetAll()
         {
+            var results = new List<IndexActors>();
+            var isScrollSetHasData = true;
+
             var result = _elasticClient.Search<IndexActors>(s => s
                 .Index(nameof(IndexActors).ToLower())
                 .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
 
-            #region
             var result2 = _elasticClient.Search<IndexActors>(s => s
                 .Index(nameof(IndexActors).ToLower())
                 .MatchAll()).Documents.ToList();
@@ -64,16 +66,14 @@ namespace Sample.Elasticsearch.Domain.Application
                 .Scroll("1m")
                 .MatchAll());
 
-            List<IndexActors> results = new List<IndexActors>();
-
             if (result4.Documents.Any())
                 results.AddRange(result4.Documents);
 
-            string scrollid = result4.ScrollId;
-            bool isScrollSetHasData = true;
+            var scrollid = result4.ScrollId;
+
             while (isScrollSetHasData)
             {
-                ISearchResponse<IndexActors> loopingResponse = _elasticClient.Scroll<IndexActors>("1m", scrollid);
+                var loopingResponse = _elasticClient.Scroll<IndexActors>("1m", scrollid);
                 if (loopingResponse.IsValid)
                 {
                     results.AddRange(loopingResponse.Documents);
@@ -83,7 +83,6 @@ namespace Sample.Elasticsearch.Domain.Application
             }
 
             _elasticClient.ClearScroll(new ClearScrollRequest(scrollid));
-            #endregion
 
             return result.ToList();
         }
@@ -99,7 +98,6 @@ namespace Sample.Elasticsearch.Domain.Application
                 .Size(10)
                 .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
 
-            #region
             var result2 = _elasticClient.Search<IndexActors>(s => s
                 .Index(nameof(IndexActors).ToLower())
                 .Query(s => s.Wildcard(w => w.Field(f => f.Name).Value(name + "*")))
@@ -109,17 +107,16 @@ namespace Sample.Elasticsearch.Domain.Application
             var result3 = _elasticClient.Search<IndexActors>(s => s
                 .Index(nameof(IndexActors).ToLower())
                 .Query(s => s.Match(m => m.Field(f => f.Name).Query(name))) //Procura cada termo com o operador OR, case insensitive
-                //.Query(s => s.Match(m => m.Field(f => f.Name).Query(name).Operator(Operator.And)) //com o operador AND
+                                                                            //.Query(s => s.Match(m => m.Field(f => f.Name).Query(name).Operator(Operator.And)) //com o operador AND
                 .Size(10)
                 .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
 
             var result4 = _elasticClient.Search<IndexActors>(s => s
                 .Index(nameof(IndexActors).ToLower())
                 .Query(s => s.MatchPhrase(m => m.Field(f => f.Name).Query(name))) //Procura o termo que contenha a frase exata
-                 //.Query(s => s.MatchPhrase(m => m.Field(f => f.Name).Query(name).Slop(1))) //Procura o termo que contenha a frase exata, pulando uma inconsistencia
+                                                                                  //.Query(s => s.MatchPhrase(m => m.Field(f => f.Name).Query(name).Slop(1))) //Procura o termo que contenha a frase exata, pulando uma inconsistencia
                 .Size(10)
                 .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
-            #endregion
 
             return result?.ToList();
         }
@@ -173,8 +170,8 @@ namespace Sample.Elasticsearch.Domain.Application
 
         public ICollection<IndexActors> GetActorsAllCondition(string term)
         {
-            QueryContainer query = new QueryContainerDescriptor<IndexActors>().Bool(b => b.Must(m => m.Exists(e => e.Field(f => f.Description))));
-            int.TryParse(term, out int numero);
+            var query = new QueryContainerDescriptor<IndexActors>().Bool(b => b.Must(m => m.Exists(e => e.Field(f => f.Description))));
+            TryParse(term, out int numero);
 
             query = query && new QueryContainerDescriptor<IndexActors>().Wildcard(w => w.Field(f => f.Name).Value($"*{term}*")) //performance ruim, use MatchPhrasePrefix
                     || new QueryContainerDescriptor<IndexActors>().Wildcard(w => w.Field(f => f.Description).Value($"*{term}*")) //performance ruim, use MatchPhrasePrefix
@@ -192,7 +189,7 @@ namespace Sample.Elasticsearch.Domain.Application
 
         public ActorsAggregationModel GetActorsAggregation()
         {
-            QueryContainer query = new QueryContainerDescriptor<IndexActors>().Bool(b => b.Must(m => m.Exists(e => e.Field(f => f.Description))));
+            var query = new QueryContainerDescriptor<IndexActors>().Bool(b => b.Must(m => m.Exists(e => e.Field(f => f.Description))));
 
             var result = _elasticClient.Search<IndexActors>(s => s
                 .Index(nameof(IndexActors).ToLower())
@@ -211,9 +208,7 @@ namespace Sample.Elasticsearch.Domain.Application
 
         public static double ObterBucketAggregationDouble(AggregateDictionary agg, string bucket)
         {
-            if (agg.BucketScript(bucket).Value.HasValue)
-                return agg.BucketScript(bucket).Value.Value;
-            return 0;
+            return agg.BucketScript(bucket).Value.HasValue ? agg.BucketScript(bucket).Value.Value : 0;
         }
     }
 }
