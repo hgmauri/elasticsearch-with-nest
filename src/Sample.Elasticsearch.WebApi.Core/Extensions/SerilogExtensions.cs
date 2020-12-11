@@ -18,7 +18,6 @@ namespace Sample.Elasticsearch.WebApi.Core.Extensions
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentUserName()
                 .Enrich.WithDemystifiedStackTraces()
-                .WriteTo.LiterateConsole()
                 .WriteTo.Debug()
                 .Filter.ByExcluding(Matching.FromSource("Microsoft.AspNetCore.StaticFiles"))
                 .Filter.ByExcluding(z => z.MessageTemplate.Text.Contains("erro de negócio"))
