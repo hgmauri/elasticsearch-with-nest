@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Sample.Elasticsearch.WebApi.Core.Extensions
 {

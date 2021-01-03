@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Sample.Elasticsearch.Domain.Application;
 using Sample.Elasticsearch.Domain.Concrete;
 using Sample.Elasticsearch.WebApi.Core.HealthCheck;

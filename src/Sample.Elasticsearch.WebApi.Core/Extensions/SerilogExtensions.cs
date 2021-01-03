@@ -1,5 +1,4 @@
 ﻿using System;
-using Elastic.CommonSchema.Serilog;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Filters;
