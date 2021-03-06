@@ -2,9 +2,7 @@
 using Newtonsoft.Json;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sample.Elasticsearch.WebApi.Core.Middleware
