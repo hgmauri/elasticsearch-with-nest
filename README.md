@@ -1,6 +1,5 @@
-# Elasticsearch with NEST in .NET Core 3.1
-
-- .NET Core 3.1
+# Elasticsearch with NEST in .NET 5.0
+- .NET 5.0
 - Docker Compose
 - NEST
 - Serilog
