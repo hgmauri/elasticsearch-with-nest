@@ -1,16 +1,16 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["Sample.Elasticsearch.WebApi/Sample.Elasticsearch.WebApi.csproj", "Sample.Elasticsearch.WebApi/"]
-COPY ["Sample.Elasticsearch.WebApi.Core/Sample.Elasticsearch.WebApi.Core.csproj", "Sample.Elasticsearch.WebApi.Core/"]
-COPY ["Sample.Elasticsearch.Domain/Sample.Elasticsearch.Domain.csproj", "Sample.Elasticsearch.Domain/"]
-RUN dotnet restore "Sample.Elasticsearch.WebApi/Sample.Elasticsearch.WebApi.csproj"
+COPY ["src/Sample.Elasticsearch.WebApi/Sample.Elasticsearch.WebApi.csproj", "src/Sample.Elasticsearch.WebApi/"]
+COPY ["src/Sample.Elasticsearch.WebApi.Core/Sample.Elasticsearch.WebApi.Core.csproj", "src/Sample.Elasticsearch.WebApi.Core/"]
+COPY ["src/Sample.Elasticsearch.Domain/Sample.Elasticsearch.Domain.csproj", "src/Sample.Elasticsearch.Domain/"]
+RUN dotnet restore "src/Sample.Elasticsearch.WebApi/Sample.Elasticsearch.WebApi.csproj"
 COPY . .
-WORKDIR "/src/Sample.Elasticsearch.WebApi"
+WORKDIR "/src/src/Sample.Elasticsearch.WebApi"
 RUN dotnet build "Sample.Elasticsearch.WebApi.csproj" -c Release -o /app/build
 
 FROM build AS publish

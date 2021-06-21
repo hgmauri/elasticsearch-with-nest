@@ -12,10 +12,11 @@ namespace Sample.Elasticsearch.WebApi.Core.Extensions
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
-                .Enrich.WithProperty("ApplicationName", $"API Elasticsearch - {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}")
+                .Enrich.WithProperty("ApplicationName", $"API Exemplo - {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}")
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentUserName()
+                .Enrich.WithDemystifiedStackTraces()
                 .WriteTo.Debug()
                 .Filter.ByExcluding(Matching.FromSource("Microsoft.AspNetCore.StaticFiles"))
                 .Filter.ByExcluding(z => z.MessageTemplate.Text.Contains("erro de negócio"))
