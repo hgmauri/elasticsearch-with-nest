@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Sample.Elasticsearch.Domain.Model
+﻿namespace Sample.Elasticsearch.Domain.Abstractions
 {
     public class ActorsAggregationModel
     {

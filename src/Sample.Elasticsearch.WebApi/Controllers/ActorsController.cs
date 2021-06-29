@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Sample.Elasticsearch.Domain.Concrete;
 using System;
+using Sample.Elasticsearch.Domain.Interfaces;
 
 namespace Sample.Elasticsearch.WebApi.Controllers
 {
@@ -48,6 +48,14 @@ namespace Sample.Elasticsearch.WebApi.Controllers
         public IActionResult GetByDescription([FromQuery] string description)
         {
             var result = _actorsApplication.GetByDescription(description);
+
+            return Json(result);
+        }
+
+        [HttpGet("all-fields")]
+        public IActionResult SearchAllProperties([FromQuery] string term)
+        {
+            var result = _actorsApplication.SearchInAllFiels(term);
 
             return Json(result);
         }
