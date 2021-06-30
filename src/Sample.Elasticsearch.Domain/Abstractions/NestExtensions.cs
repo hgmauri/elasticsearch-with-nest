@@ -10,14 +10,12 @@ namespace Sample.Elasticsearch.Domain.Abstractions
     {
         public static QueryContainer BuildMultiMatchQuery<T>(string queryValue) where T : class
         {
-            var fields = typeof(T).GetProperties().Where(p => p.PropertyType == typeof(string)).Select(p => p.Name.ToLower()).ToArray();
+            var fields = typeof(T).GetProperties().Select(p => p.Name.ToLower()).ToArray();
 
             return new QueryContainerDescriptor<T>()
                 .MultiMatch(c => c
                     .Type(TextQueryType.Phrase)
-                    .Fields(f => f
-                        .Fields(fields)
-                    ).Query(queryValue));
+                    .Fields(f => f.Fields(fields)).Lenient(true).Query(queryValue));
         }
 
         public static List<IndexActors> GetSampleData()
