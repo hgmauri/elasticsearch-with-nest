@@ -10,7 +10,7 @@ namespace Sample.Elasticsearch.Domain.Abstractions
     {
         public static QueryContainer BuildMultiMatchQuery<T>(string queryValue) where T : class
         {
-            var fields = typeof(T).GetProperties().Where(p => p.PropertyType.DeclaringType == typeof(string)).Select(p => p.Name.ToLower()).ToArray();
+            var fields = typeof(T).GetProperties().Where(p => p.PropertyType == typeof(string)).Select(p => p.Name.ToLower()).ToArray();
 
             return new QueryContainerDescriptor<T>()
                 .MultiMatch(c => c
@@ -35,6 +35,11 @@ namespace Sample.Elasticsearch.Domain.Abstractions
                 new() {Id = "2eda34e3-3cdb-47b7-ac56-c5946d7d695a", RegistrationDate = DateTime.Now, BirthDate = new DateTime(1940, 4, 25),Age = 80, TotalMovies = 78, Name = "Al Pacino", Description = "Al Pacino nasceu em Nova York (East Harlem), filho dos Ítalo-americanos Salvatore Pacino e Rose, que se divorciaram quando tinha dois anos.[1] Sua mãe mudou-se para próximo ao Zoológico do Bronx para morar com seus pais, Kate e James Gerardi, que, por coincidência, tinham vindo de uma cidade na Sicília chamada Corleone.[2] Seu pai que era de San Fratello na Província de Messina, mudou-se para Covina, Califórnia, onde trabalhou como vendedor de seguros e gerente/proprietário de restaurante.[1]"}
             };
             return list;
+        }
+
+        public static double ObterBucketAggregationDouble(AggregateDictionary agg, string bucket)
+        {
+            return agg.BucketScript(bucket).Value.HasValue ? agg.BucketScript(bucket).Value.Value : 0;
         }
     }
 }

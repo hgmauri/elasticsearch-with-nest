@@ -6,7 +6,6 @@ using Nest;
 using Sample.Elasticsearch.Domain.Abstractions;
 using Sample.Elasticsearch.Domain.Indices;
 using Sample.Elasticsearch.Domain.Interfaces;
-using static System.Int32;
 
 namespace Sample.Elasticsearch.Domain.Applications
 {
@@ -79,24 +78,11 @@ namespace Sample.Elasticsearch.Domain.Applications
 
         public async Task<ICollection<IndexActors>> GetByName(string name)
         {
-            var response = _elasticClient.Search<IndexActors>(s => s
-                .Query(qry => qry
-                    .Bool(b => b
-                        .Must(m => m
-                            .QueryString(qs => qs
-                                .DefaultField("_all")
-                                .Query(name))))));
-
             //lowcase
             var result = await _actorsRepository.SearchAsync(descriptor =>
-                 {
-                     return descriptor.Query(containerDescriptor => containerDescriptor.Term(p => p.Field(p => p.Name).Value(name)));
-                 });
-
-            var resulwwt = await _actorsRepository.SearchAsync(descriptor =>
-            {
-                return descriptor.Query(containerDescriptor => containerDescriptor.Term(p => p.Field("name").Value(name)));
-            });
+             {
+                 return descriptor.Query(containerDescriptor => containerDescriptor.Term(p => p.Field(p => p.Name).Value(name)));
+             });
 
             //contains
             var result2 = _elasticClient.Search<IndexActors>(s => s
@@ -135,8 +121,6 @@ namespace Sample.Elasticsearch.Domain.Applications
 
             return result?.ToList();
         }
-
-
 
         public ICollection<IndexActors> SearchInAllFiels(string term)
         {
@@ -201,7 +185,7 @@ namespace Sample.Elasticsearch.Domain.Applications
         public ICollection<IndexActors> GetActorsAllCondition(string term)
         {
             var query = new QueryContainerDescriptor<IndexActors>().Bool(b => b.Must(m => m.Exists(e => e.Field(f => f.Description))));
-            TryParse(term, out int numero);
+            int.TryParse(term, out var numero);
 
             query = query && new QueryContainerDescriptor<IndexActors>().Wildcard(w => w.Field(f => f.Name).Value($"*{term}*")) //bad performance, use MatchPhrasePrefix
                     || new QueryContainerDescriptor<IndexActors>().Wildcard(w => w.Field(f => f.Description).Value($"*{term}*")) //bad performance, use MatchPhrasePrefix
@@ -229,16 +213,11 @@ namespace Sample.Elasticsearch.Domain.Applications
                             .Average("AvAge", sa => sa.Field(p => p.Age))
                         ));
 
-            var totalAge = ObterBucketAggregationDouble(result.Aggregations, "TotalAge");
-            var totalMovies = ObterBucketAggregationDouble(result.Aggregations, "TotalMovies");
-            var avAge = ObterBucketAggregationDouble(result.Aggregations, "AvAge");
+            var totalAge = NestExtensions.ObterBucketAggregationDouble(result.Aggregations, "TotalAge");
+            var totalMovies = NestExtensions.ObterBucketAggregationDouble(result.Aggregations, "TotalMovies");
+            var avAge = NestExtensions.ObterBucketAggregationDouble(result.Aggregations, "AvAge");
 
             return new ActorsAggregationModel { TotalAge = totalAge, TotalMovies = totalMovies, AverageAge = avAge };
-        }
-
-        public static double ObterBucketAggregationDouble(AggregateDictionary agg, string bucket)
-        {
-            return agg.BucketScript(bucket).Value.HasValue ? agg.BucketScript(bucket).Value.Value : 0;
         }
     }
 }
