@@ -15,7 +15,7 @@ namespace Sample.Elasticsearch.Domain.Abstractions
             return new QueryContainerDescriptor<T>()
                 .MultiMatch(c => c
                     .Type(TextQueryType.Phrase)
-                    .Fields(f => f.Fields(fields)).Lenient(true).Query(queryValue));
+                    .Fields(f => f.Fields(fields)).Lenient().Query(queryValue));
         }
 
         public static List<IndexActors> GetSampleData()

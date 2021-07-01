@@ -1,12 +1,6 @@
 version: '3.4'
 
 services:
-  sample-elasticsearch:
-    image: ${DOCKER_REGISTRY-}sampleelasticsearch
-    build:
-      context: .
-      dockerfile: src/Sample.Elasticsearch.WebApi/Dockerfile
-
   elasticsearch:
    container_name: elasticsearch
    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0

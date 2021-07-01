@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Elasticsearch.Domain", "src\Sample.Elasticsearch.Domain\Sample.Elasticsearch.Domain.csproj", "{8038EF31-9DC6-4AF4-AC1A-A36C4C918B53}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{18F6D3A5-091F-4A10-B5BC-57E2239C80D6}"
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker\docker-compose.dcproj", "{18F6D3A5-091F-4A10-B5BC-57E2239C80D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
