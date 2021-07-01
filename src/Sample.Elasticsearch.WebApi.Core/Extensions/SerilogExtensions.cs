@@ -18,7 +18,7 @@ namespace Sample.Elasticsearch.WebApi.Core.Extensions
                 .Enrich.WithEnvironmentUserName()
                 .WriteTo.Debug()
                 .Filter.ByExcluding(Matching.FromSource("Microsoft.AspNetCore.StaticFiles"))
-                .Filter.ByExcluding(z => z.MessageTemplate.Text.Contains("erro de negócio"))
+                .Filter.ByExcluding(z => z.MessageTemplate.Text.Contains("specific error"))
                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["ElasticsearchSettings:uri"]))
                 {
                     AutoRegisterTemplate = true,

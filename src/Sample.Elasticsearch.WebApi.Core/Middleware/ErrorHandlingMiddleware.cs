@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using Serilog;
 using System;
-using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Sample.Elasticsearch.WebApi.Core.Middleware
@@ -28,21 +27,21 @@ namespace Sample.Elasticsearch.WebApi.Core.Middleware
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             Log.Error(exception, "Erro não tratado");
 
-            var code = HttpStatusCode.InternalServerError;
-
-            if (exception is Exception) code = HttpStatusCode.BadRequest;
-            // else if (exception is MyUnauthorizedException) code = HttpStatusCode.Unauthorized;
-            // else if (exception is MyException)             code = HttpStatusCode.BadRequest;
-
-            var result = JsonConvert.SerializeObject(new { error = exception.Message });
-
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)code;
-            return context.Response.WriteAsync(result);
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+            var result = JsonSerializer.Serialize(new { error = exception?.Message }, new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+                DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            await context.Response.WriteAsync(result);
         }
     }
 }

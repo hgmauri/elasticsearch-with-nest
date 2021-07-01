@@ -22,6 +22,12 @@ namespace Sample.Elasticsearch.WebApi.Controllers
             return Ok(new { Result = "Data successfully registered with Elasticsearch" });
         }
 
+        [HttpPost("exception")]
+        public IActionResult PostException()
+        {
+            throw new Exception("Generate sample exception");
+        }
+
         [HttpGet("")]
         public IActionResult GetAll()
         {
