@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using Sample.Elasticsearch.Domain.Abstractions;
 using Sample.Elasticsearch.Domain.Interfaces;
 
 namespace Sample.Elasticsearch.WebApi.Controllers
