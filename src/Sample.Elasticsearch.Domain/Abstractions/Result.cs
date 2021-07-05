@@ -4,33 +4,34 @@ namespace Sample.Elasticsearch.Domain.Abstractions
 {
     public class Result<T> : IResult<T> where T : class, new()
     {
-        public Result(string message, bool success, T data)
+        public T Data { get; set; }
+        public string Message { get; set; }
+        public bool Success { get; set; }
+
+        public Result(bool success, string message, T data)
         {
             Data = data;
             Message = message;
-            IsSuccess = success;
+            Success = success;
         }
 
         public Result(bool success, string message)
         {
             Message = message;
-            IsSuccess = success;
+            Success = success;
         }
 
         public Result(bool success, T data)
         {
             Data = data;
-            IsSuccess = success;
+            Success = success;
         }
         public Result(bool success)
         {
-            IsSuccess = success;
+            Success = success;
         }
-        public T Data { get; set; }
-        public string Message { get; set; }
-        public bool IsSuccess { get; set; }
 
-        public static Result<T> Failure(string message) => new Result<T>(false, message);
-        public static Result<T> Success(T data) => new Result<T>(true, data);
+        public static Result<T> FailureResult(string message) => new(false, message);
+        public static Result<T> SuccessResult(T data) => new(true, data);
     }
 }
