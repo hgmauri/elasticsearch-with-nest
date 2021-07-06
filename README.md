@@ -1,6 +1,7 @@
 # Elasticsearch with NEST in .NET 5.0
-- .NET 5.0
 - Docker Compose
+- .NET 5.0
+- Swashbuckle Swagger
 - NEST
 - Serilog
 - HealthCheck
