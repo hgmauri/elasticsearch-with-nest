@@ -5,7 +5,7 @@
     <DockerTargetOS>Linux</DockerTargetOS>
     <ProjectGuid>18f6d3a5-091f-4a10-b5bc-57e2239c80d6</ProjectGuid>
     <DockerLaunchAction>None</DockerLaunchAction>
-    <DockerServiceName>sample-elasticsearch</DockerServiceName>
+    <DockerServiceName>elasticsearch-with-nest</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.yml" />
