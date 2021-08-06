@@ -47,7 +47,7 @@ namespace Sample.Elasticsearch.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogEnricherExtensions.EnrichFromRequest);
+            app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = SerilogExtensions.EnrichFromRequest);
 
             app.UseMiddleware<RequestSerilLogMiddleware>();
             app.UseMiddleware<ErrorHandlingMiddleware>();
