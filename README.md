@@ -5,6 +5,7 @@
 - NEST
 - Serilog
 - HealthCheck
+- HealthCheck UI
 - Elasticsearch Repository
 - Exception Middleware
 
