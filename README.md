@@ -1,5 +1,5 @@
 # Elasticsearch with NEST in .NET 5.0
-- Docker Compose
+- Docker
 - .NET 5.0
 - Swashbuckle Swagger
 - NEST
