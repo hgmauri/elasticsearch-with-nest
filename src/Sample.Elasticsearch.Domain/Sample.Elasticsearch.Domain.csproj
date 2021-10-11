@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NEST" Version="7.15.0" />
+    <ProjectReference Include="..\Sample.Elasticsearch.Infrastructure\Sample.Elasticsearch.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

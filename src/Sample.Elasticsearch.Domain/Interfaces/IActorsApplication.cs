@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Sample.Elasticsearch.Infrastructure.Abstractions;
+using Sample.Elasticsearch.Infrastructure.Indices;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Sample.Elasticsearch.Domain.Abstractions;
-using Sample.Elasticsearch.Domain.Indices;
 
 namespace Sample.Elasticsearch.Domain.Interfaces
 {

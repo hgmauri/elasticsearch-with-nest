@@ -1,4 +1,4 @@
-﻿namespace Sample.Elasticsearch.Domain.Abstractions
+﻿namespace Sample.Elasticsearch.Infrastructure.Abstractions
 {
     public class ActorsAggregationModel
     {

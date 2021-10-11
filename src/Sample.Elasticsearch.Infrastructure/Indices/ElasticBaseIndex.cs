@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sample.Elasticsearch.Domain.Indices
+namespace Sample.Elasticsearch.Infrastructure.Indices
 {
     public abstract class ElasticBaseIndex
     {

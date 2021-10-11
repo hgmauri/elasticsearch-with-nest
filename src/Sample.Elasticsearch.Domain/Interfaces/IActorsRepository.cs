@@ -1,4 +1,5 @@
-﻿using Sample.Elasticsearch.Domain.Indices;
+﻿using Sample.Elasticsearch.Infrastructure.Indices;
+using Sample.Elasticsearch.Infrastructure.Interfaces;
 
 namespace Sample.Elasticsearch.Domain.Interfaces
 {

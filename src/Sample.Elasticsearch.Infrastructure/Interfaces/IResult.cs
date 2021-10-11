@@ -1,5 +1,5 @@
 ﻿
-namespace Sample.Elasticsearch.Domain.Interfaces
+namespace Sample.Elasticsearch.Infrastructure.Interfaces
 {
     public interface IResult<T> where T : class
     {

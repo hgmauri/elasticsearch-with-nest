@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nest;
-using Sample.Elasticsearch.Domain.Abstractions;
-using Sample.Elasticsearch.Domain.Indices;
 using Sample.Elasticsearch.Domain.Interfaces;
+using Sample.Elasticsearch.Infrastructure.Abstractions;
+using Sample.Elasticsearch.Infrastructure.Indices;
 
 namespace Sample.Elasticsearch.Domain.Applications
 {

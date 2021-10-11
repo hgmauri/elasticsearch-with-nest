@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nest;
-using Sample.Elasticsearch.Domain.Indices;
+using Sample.Elasticsearch.Infrastructure.Indices;
 
-namespace Sample.Elasticsearch.Domain.Abstractions
+namespace Sample.Elasticsearch.Infrastructure.Abstractions
 {
     public static class NestExtensions
     {

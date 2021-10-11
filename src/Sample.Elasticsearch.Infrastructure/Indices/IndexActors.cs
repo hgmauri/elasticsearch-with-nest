@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sample.Elasticsearch.Domain.Indices
+namespace Sample.Elasticsearch.Infrastructure.Indices
 {
     public class IndexActors : ElasticBaseIndex
     {
@@ -11,6 +11,5 @@ namespace Sample.Elasticsearch.Domain.Indices
         public int Age { get; set; }
         public int TotalMovies { get; set; }
         public string Movies { get; set; }
-
     }
 }

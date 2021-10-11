@@ -1,6 +1,6 @@
-﻿using Sample.Elasticsearch.Domain.Interfaces;
+﻿using Sample.Elasticsearch.Infrastructure.Interfaces;
 
-namespace Sample.Elasticsearch.Domain.Abstractions
+namespace Sample.Elasticsearch.Infrastructure.Abstractions
 {
     public class Result<T> : IResult<T> where T : class, new()
     {
