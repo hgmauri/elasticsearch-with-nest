@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 using Nest;
 using Sample.Elasticsearch.Infrastructure.Abstractions;
 using Sample.Elasticsearch.Infrastructure.Indices;
-using Sample.Elasticsearch.Infrastructure.Interfaces;
 using Serilog;
 
-namespace Sample.Elasticsearch.Infrastructure.Repositories
+namespace Sample.Elasticsearch.Infrastructure.Elastic
 {
     public abstract class ElasticBaseRepository<T> : IElasticBaseRepository<T> where T : ElasticBaseIndex
     {

@@ -1,7 +1,7 @@
 ﻿using Nest;
 using Sample.Elasticsearch.Domain.Interfaces;
+using Sample.Elasticsearch.Infrastructure.Elastic;
 using Sample.Elasticsearch.Infrastructure.Indices;
-using Sample.Elasticsearch.Infrastructure.Repositories;
 
 namespace Sample.Elasticsearch.Domain.Repositories
 {

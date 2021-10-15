@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nest;
 
-namespace Sample.Elasticsearch.Infrastructure.Interfaces
+namespace Sample.Elasticsearch.Infrastructure.Elastic
 {
     public interface IElasticBaseRepository<T> where T : class
     {
