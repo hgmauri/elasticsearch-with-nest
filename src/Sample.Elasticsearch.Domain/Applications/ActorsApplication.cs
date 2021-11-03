@@ -12,6 +12,7 @@ namespace Sample.Elasticsearch.Domain.Applications
     public class ActorsApplication : IActorsApplication
     {
         private readonly IActorsRepository _actorsRepository;
+
         public ActorsApplication(IActorsRepository actorsRepository)
         {
             _actorsRepository = actorsRepository;
