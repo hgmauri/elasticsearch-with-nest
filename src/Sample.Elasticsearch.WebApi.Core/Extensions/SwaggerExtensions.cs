@@ -8,7 +8,7 @@ namespace Sample.Elasticsearch.WebApi.Core.Extensions
 {
     public static class SwaggerExtensions
     {
-        public static void AddSwagger(this IServiceCollection services, IConfiguration configuration)
+        public static void AddSwagger(this IServiceCollection services)
         {
             services.AddSwaggerGen(c =>
             {

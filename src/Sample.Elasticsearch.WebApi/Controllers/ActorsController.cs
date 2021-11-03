@@ -17,7 +17,7 @@ namespace Sample.Elasticsearch.WebApi.Controllers
         [HttpPost("sample")]
         public IActionResult PostSampleData()
         {
-            _actorsApplication.PostActorsSample();
+            _actorsApplication.InsertManyAsync();
 
             return Ok(new { Result = "Data successfully registered with Elasticsearch" });
         }
@@ -31,23 +31,64 @@ namespace Sample.Elasticsearch.WebApi.Controllers
         [HttpGet("")]
         public IActionResult GetAll()
         {
-            var result = _actorsApplication.GetAll();
+            var result = _actorsApplication.GetAllAsync();
 
             return Json(result);
         }
 
-        [HttpGet("name")]
-        public IActionResult GetByName([FromQuery] string name)
+        [HttpGet("name-match")]
+        public IActionResult GetByNameWithMatch([FromQuery] string name)
         {
-            var result = _actorsApplication.GetByName(name);
+            var result = _actorsApplication.GetByNameWithMatch(name);
 
             return Json(result);
         }
 
-        [HttpGet("description")]
-        public IActionResult GetByDescription([FromQuery] string description)
+
+        [HttpGet("name-matchphrase")]
+        public IActionResult GetByNameWithMatchPhrase([FromQuery] string name)
         {
-            var result = _actorsApplication.GetByDescription(description);
+            var result = _actorsApplication.GetByNameWithMatchPhrase(name);
+
+            return Json(result);
+        }
+
+        [HttpGet("name-matchphraseprefix")]
+        public IActionResult GetByNameWithMatchPhrasePrefix([FromQuery] string name)
+        {
+            var result = _actorsApplication.GetByNameWithMatchPhrasePrefix(name);
+
+            return Json(result);
+        }
+
+        [HttpGet("name-term")]
+        public IActionResult GetByNameWithTerm([FromQuery] string name)
+        {
+            var result = _actorsApplication.GetByNameWithTerm(name);
+
+            return Json(result);
+        }
+
+        [HttpGet("name-wildcard")]
+        public IActionResult GetByNameWithWildcard([FromQuery] string name)
+        {
+            var result = _actorsApplication.GetByNameWithWildcard(name);
+
+            return Json(result);
+        }
+
+        [HttpGet("name-fuzzy")]
+        public IActionResult GetByNameWithFuzzy([FromQuery] string name)
+        {
+            var result = _actorsApplication.GetByNameWithFuzzy(name);
+
+            return Json(result);
+        }
+
+        [HttpGet("description-match")]
+        public IActionResult GetByDescriptionMatch([FromQuery] string description)
+        {
+            var result = _actorsApplication.GetByDescriptionMatch(description);
 
             return Json(result);
         }

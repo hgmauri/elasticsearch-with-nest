@@ -11,7 +11,7 @@ namespace Sample.Elasticsearch.Infrastructure.Elastic
 {
     public abstract class ElasticBaseRepository<T> : IElasticBaseRepository<T> where T : ElasticBaseIndex
     {
-        protected IElasticClient _elasticClient;
+        private readonly IElasticClient _elasticClient;
 
         public abstract string IndexName { get; }
 
@@ -46,76 +46,65 @@ namespace Sample.Elasticsearch.Infrastructure.Elastic
         {
             var response = await _elasticClient.GetAsync(DocumentPath<T>.Id(id).Index(IndexName));
 
-            if (response.IsValid)
-                return response.Source;
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return null;
+            return response.Source;
         }
 
         public async Task<T> FindAsync(IGetRequest request)
         {
             var response = await _elasticClient.GetAsync<T>(request);
 
-            if (response.IsValid)
-                return response.Source;
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return null;
+            return response.Source;
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            IList<T> list = new List<T>();
             var search = new SearchDescriptor<T>(IndexName).MatchAll();
             var response = await _elasticClient.SearchAsync<T>(search);
-            if (response.IsValid)
-            {
-                foreach (var hit in response.Hits)
-                {
-                    list.Add(hit.Source);
-                }
-                return list;
-            }
 
-            throw new Exception(response.ServerError.ToString());
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
+
+            return response.Hits.Select(hit => hit.Source).ToList();
         }
 
         public async Task<IEnumerable<T>> GetManyAsync(IEnumerable<string> ids)
         {
             var response = await _elasticClient.GetManyAsync<T>(ids, IndexName);
+
             return response.Select(item => item.Source).ToList();
         }
 
-        public async Task<IEnumerable<T>> SearchAsync(ISearchRequest request)
+        public async Task<IEnumerable<T>> SearchAsync(Func<QueryContainerDescriptor<T>, QueryContainer> request)
         {
-            var list = new List<T>();
-            var response = await _elasticClient.SearchAsync<T>(request);
+            var response = await _elasticClient.SearchAsync<T>(s =>
+                s.Index(IndexName)
+                    .Query(request)
+                    .Lenient());
 
-            if (response.IsValid)
-            {
-                list.AddRange(from hit in response.Hits select hit.Source);
-                return list;
-            }
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return null;
+            return response.Hits.Select(hit => hit.Source).ToList();
         }
 
-        public async Task<T> SearchByFieldAsync(Func<QueryContainerDescriptor<T>, QueryContainer> request)
+        public async Task<ISearchResponse<T>> SearchAsync(Func<QueryContainerDescriptor<T>, QueryContainer> request,
+            Func<AggregationContainerDescriptor<T>, IAggregationContainer> aggregationsSelector)
         {
-            var response = await _elasticClient.SearchAsync<T>(s => s.Index(IndexName).Query(request));
+            var response = await _elasticClient.SearchAsync<T>(s =>
+                s.Index(IndexName)
+                    .Query(request)
+                    .Aggregations(aggregationsSelector));
 
-            if (response.IsValid)
-            {
-                var list = from hit in response.Hits select hit.Source;
-                var entry = list.FirstOrDefault();
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-                return entry;
-            }
-
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return null;
+            return response;
         }
 
         public async Task<IEnumerable<T>> SearchAsync(Func<SearchDescriptor<T>, ISearchRequest> selector)
@@ -123,14 +112,10 @@ namespace Sample.Elasticsearch.Infrastructure.Elastic
             var list = new List<T>();
             var response = await _elasticClient.SearchAsync(selector);
 
-            if (response.IsValid)
-            {
-                list.AddRange(from hit in response.Hits select hit.Source);
-                return list;
-            }
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return null;
+            return response.Hits.Select(hit => hit.Source).ToList();
         }
 
         public async Task<IEnumerable<T>> SearchInAllFields(string term)
@@ -144,10 +129,10 @@ namespace Sample.Elasticsearch.Infrastructure.Elastic
         {
             if (!(await _elasticClient.Indices.ExistsAsync(IndexName)).Exists)
             {
-                await _elasticClient.Indices.CreateAsync(IndexName, descriptor =>
+                await _elasticClient.Indices.CreateAsync(IndexName, c =>
                 {
-                    descriptor.Map(mappingDescriptor => mappingDescriptor.AutoMap<T>());
-                    return descriptor;
+                    c.Map<T>(p => p.AutoMap());
+                    return c;
                 });
             }
             return true;
@@ -157,33 +142,30 @@ namespace Sample.Elasticsearch.Infrastructure.Elastic
         {
             var response = await _elasticClient.IndexAsync(model, descriptor => descriptor.Index(IndexName));
 
-            if (response.IsValid)
-                return true;
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return false;
+            return true;
         }
 
         public async Task<bool> InsertManyAsync(IList<T> tList)
         {
             var response = await _elasticClient.IndexManyAsync(tList, IndexName);
 
-            if (response.IsValid)
-                return true;
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return false;
+            return true;
         }
 
         public async Task<bool> UpdateAsync(T model)
         {
             var response = await _elasticClient.UpdateAsync(DocumentPath<T>.Id(model.Id).Index(IndexName), p => p.Doc(model));
 
-            if (response.IsValid)
-                return true;
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return false;
+            return true;
         }
 
         public async Task<bool> UpdatePartAsync(T model, object partialEntity)
@@ -194,22 +176,20 @@ namespace Sample.Elasticsearch.Infrastructure.Elastic
             };
             var response = await _elasticClient.UpdateAsync(request);
 
-            if (response.IsValid)
-                return true;
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return false;
+            return true;
         }
 
         public async Task<bool> DeleteByIdAsync(string id)
         {
             var response = await _elasticClient.DeleteAsync(DocumentPath<T>.Id(id).Index(IndexName));
 
-            if (response.IsValid)
-                return true;
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return false;
+            return true;
         }
 
         public async Task<bool> DeleteByQueryAsync(Func<QueryContainerDescriptor<T>, QueryContainer> selector)
@@ -219,11 +199,10 @@ namespace Sample.Elasticsearch.Infrastructure.Elastic
                 .Index(IndexName)
             );
 
-            if (response.IsValid)
-                return true;
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return false;
+            return true;
         }
 
         public async Task<long> GetTotalCountAsync()
@@ -231,16 +210,19 @@ namespace Sample.Elasticsearch.Infrastructure.Elastic
             var search = new SearchDescriptor<T>(IndexName).MatchAll();
             var response = await _elasticClient.SearchAsync<T>(search);
 
-            if (response.IsValid)
-                return response.Total;
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
 
-            Log.Error(response.OriginalException, response.ServerError?.ToString());
-            return default;
+            return response.Total;
         }
 
         public async Task<bool> ExistAsync(string id)
         {
             var response = await _elasticClient.DocumentExistsAsync(DocumentPath<T>.Id(id).Index(IndexName));
+
+            if (!response.IsValid)
+                throw new Exception(response.ServerError?.ToString(), response.OriginalException);
+
             return response.Exists;
         }
     }

@@ -22,7 +22,7 @@ namespace Sample.Elasticsearch.WebApi
             services.AddApiConfiguration();
 
             services.AddElasticsearch(Configuration);
-            services.AddSwagger(Configuration);
+            services.AddSwagger();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -34,12 +34,6 @@ namespace Sample.Elasticsearch.WebApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/hc",
-                    new HealthCheckOptions
-                    {
-                        Predicate = _ => true,
-                        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
-                    });
             });
         }
     }

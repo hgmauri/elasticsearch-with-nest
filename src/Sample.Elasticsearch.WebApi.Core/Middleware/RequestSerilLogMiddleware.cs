@@ -24,7 +24,7 @@ namespace Sample.Elasticsearch.WebApi.Core.Middleware
             }
         }
 
-        private string GetCorrelationId(HttpContext httpContext)
+        private static string GetCorrelationId(HttpContext httpContext)
         {
             httpContext.Request.Headers.TryGetValue("Cko-Correlation-Id", out StringValues correlationId);
             return correlationId.FirstOrDefault() ?? httpContext.TraceIdentifier;

@@ -11,147 +11,93 @@ namespace Sample.Elasticsearch.Domain.Applications
 {
     public class ActorsApplication : IActorsApplication
     {
-        private readonly IElasticClient _elasticClient;
         private readonly IActorsRepository _actorsRepository;
-        public ActorsApplication(IElasticClient elasticClient, IActorsRepository actorsRepository)
+        public ActorsApplication(IActorsRepository actorsRepository)
         {
-            _elasticClient = elasticClient;
             _actorsRepository = actorsRepository;
         }
 
-        public async Task PostActorsSample()
+        public async Task InsertManyAsync()
         {
             await _actorsRepository.InsertManyAsync(NestExtensions.GetSampleData());
         }
 
-        public async Task<ICollection<IndexActors>> GetAll()
+        public async Task<ICollection<IndexActors>> GetAllAsync()
         {
             var result = await _actorsRepository.GetAllAsync();
-
-            //or
-            var result1 = _elasticClient.Search<IndexActors>(s => s
-                .Index(nameof(IndexActors).ToLower())
-                .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
-
-            //or
-            var result2 = _elasticClient.Search<IndexActors>(s => s
-                .Index(nameof(IndexActors).ToLower())
-                .MatchAll()).Documents.ToList();
-
-            //or
-            var result3 = _elasticClient.Search<IndexActors>(s => s
-                .Index(nameof(IndexActors).ToLower())
-                .From(0)
-                .Size(10)
-                .MatchAll()).Documents.ToList();
-
-            //or (scroll)
-            var results = new List<IndexActors>();
-            var isScrollSetHasData = true;
-            var result4 = _elasticClient.Search<IndexActors>(s => s
-                .Index(nameof(IndexActors).ToLower())
-                .From(0)
-                .Size(10)
-                .Scroll("1m")
-                .MatchAll());
-
-            if (result4.Documents.Any())
-                results.AddRange(result4.Documents);
-
-            var scrollid = result4.ScrollId;
-
-            while (isScrollSetHasData)
-            {
-                var loopingResponse = _elasticClient.Scroll<IndexActors>("1m", scrollid);
-                if (loopingResponse.IsValid)
-                {
-                    results.AddRange(loopingResponse.Documents);
-                    scrollid = loopingResponse.ScrollId;
-                }
-                isScrollSetHasData = loopingResponse.Documents.Any();
-            }
-
-            await _elasticClient.ClearScrollAsync(new ClearScrollRequest(scrollid));
 
             return result.ToList();
         }
 
-        public async Task<ICollection<IndexActors>> GetByName(string name)
+        //lowcase
+        public async Task<ICollection<IndexActors>> GetByNameWithTerm(string name)
         {
-            //lowcase
-            var result = await _actorsRepository.SearchAsync(descriptor =>
-             {
-                 return descriptor.Query(containerDescriptor => containerDescriptor.Term(p => p.Field(p => p.Name).Value(name)));
-             });
-
-            //contains
-            var result2 = _elasticClient.Search<IndexActors>(s => s
-                .Index(nameof(IndexActors).ToLower())
-                .Query(s => s.Wildcard(w => w.Field(f => f.Name).Value(name + "*")))
-                .Size(10)
-                .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
-
-            //using operator OR in case insensitive
-            var result3 = _elasticClient.Search<IndexActors>(s => s
-                .Index(nameof(IndexActors).ToLower())
-                .Query(s => s.Match(m => m.Field(f => f.Name).Query(name)))
-                .Size(10)
-                .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
-
-            //using operator AND in case insensitive
-            var result4 = _elasticClient.Search<IndexActors>(s => s
-                .Index(nameof(IndexActors).ToLower())
-                .Query(s => s.Match(m => m.Field(f => f.Name).Query(name).Operator(Operator.And)))
-                .Size(10)
-                .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
-
-            //usign match phrase
-            var result5 = _elasticClient.Search<IndexActors>(s => s
-                .Index(nameof(IndexActors).ToLower())
-                .Query(s => s.MatchPhrase(m => m.Field(f => f.Name).Query(name)))
-                .Size(10)
-                .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
-
-            //usign match phrase slop 1 inconsistency
-            var result6 = _elasticClient.Search<IndexActors>(s => s
-                .Index(nameof(IndexActors).ToLower())
-                .Query(s => s.MatchPhrase(m => m.Field(f => f.Name).Query(name).Slop(1)))
-                .Size(10)
-                .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
+            var query = new QueryContainerDescriptor<IndexActors>().Term(p => p.Field(p => p.Name).Value(name));
+            var result = await _actorsRepository.SearchAsync(_ => query);
 
             return result?.ToList();
         }
 
-        public ICollection<IndexActors> SearchInAllFiels(string term)
+        //using operator OR in case insensitive
+        public async Task<ICollection<IndexActors>> GetByNameWithMatch(string name)
         {
-            var result = _elasticClient.Search<IndexActors>(s => s
-                .Query(p => NestExtensions.BuildMultiMatchQuery<IndexActors>(term))).Documents.ToList();
+            var query = new QueryContainerDescriptor<IndexActors>().Match(p => p.Field(f => f.Name).Query(name));
+            var result = await _actorsRepository.SearchAsync(_ => query);
 
-            return result;
+            return result?.ToList();
         }
 
-        public ICollection<IndexActors> GetByDescription(string description)
+        public async Task<ICollection<IndexActors>> GetByNameWithMatchPhrase(string name)
+        {
+            var query = new QueryContainerDescriptor<IndexActors>().MatchPhrase(p => p.Field(f => f.Name).Query(name));
+            var result = await _actorsRepository.SearchAsync(_ => query);
+
+            return result?.ToList();
+        }
+
+        public async Task<ICollection<IndexActors>> GetByNameWithMatchPhrasePrefix(string name)
+        {
+            var query = new QueryContainerDescriptor<IndexActors>().MatchPhrasePrefix(p => p.Field(f => f.Name).Query(name));
+            var result = await _actorsRepository.SearchAsync(_ => query);
+            
+            return result?.ToList();
+        }
+
+        //contains
+        public async Task<ICollection<IndexActors>> GetByNameWithWildcard(string name)
+        {
+            var query = new QueryContainerDescriptor<IndexActors>().Wildcard(w => w.Field(f => f.Name).Value(name + "*"));
+            var result = await _actorsRepository.SearchAsync(_ => query);
+            
+            return result?.ToList();
+        }
+
+        public async Task<ICollection<IndexActors>> GetByNameWithFuzzy(string name)
+        {
+            var query = new QueryContainerDescriptor<IndexActors>().Fuzzy(descriptor => descriptor.Field(p => p.Name).Value(name));
+            var result = await _actorsRepository.SearchAsync(_ => query);
+
+            return result?.ToList();
+        }
+
+        public async Task<ICollection<IndexActors>> SearchInAllFiels(string term)
+        {
+            var query = NestExtensions.BuildMultiMatchQuery<IndexActors>(term);
+            var result = await _actorsRepository.SearchAsync(_ => query);
+
+            return result.ToList();
+        }
+
+        public async Task<ICollection<IndexActors>> GetByDescriptionMatch(string description)
         {
             //case insensitive
-            var query = new QueryContainerDescriptor<IndexActors>().Match(t => t.Field(f => f.Description).Query(description));
-            var result = _elasticClient.Search<IndexActors>(s => s
-                    .Index(nameof(IndexActors).ToLower())
-                    .Query(s => query)
-                    .Size(10)
-                    .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
-
-            //case sensitive
-            var query1 = new QueryContainerDescriptor<IndexActors>().Term(t => t.Description, description);
-            var result1 = _elasticClient.Search<IndexActors>(s => s
-                    .Index(nameof(IndexActors).ToLower())
-                    .Query(s => query)
-                    .Size(10)
-                    .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
+            var query = new QueryContainerDescriptor<IndexActors>().Match(p => p.Field(f => f.Description).Query(description));
+            var result = await _actorsRepository.SearchAsync(_ => query);
 
             return result?.ToList();
         }
 
-        public ICollection<IndexActors> GetActorsCondition(string name, string description, DateTime? birthdate)
+        public async Task<ICollection<IndexActors>> GetActorsCondition(string name, string description, DateTime? birthdate)
         {
             QueryContainer query = new QueryContainerDescriptor<IndexActors>();
 
@@ -173,16 +119,12 @@ namespace Sample.Elasticsearch.Domain.Applications
                                            .TimeZone("+00:00"))));
             }
 
-            var result = _elasticClient.Search<IndexActors>(s => s
-                    .Index(nameof(IndexActors).ToLower())
-                    .Query(s => query)
-                    .Size(10)
-                    .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
+            var result = await _actorsRepository.SearchAsync(_ => query);
 
             return result?.ToList();
         }
 
-        public ICollection<IndexActors> GetActorsAllCondition(string term)
+        public async Task<ICollection<IndexActors>> GetActorsAllCondition(string term)
         {
             var query = new QueryContainerDescriptor<IndexActors>().Bool(b => b.Must(m => m.Exists(e => e.Field(f => f.Description))));
             int.TryParse(term, out var numero);
@@ -192,26 +134,19 @@ namespace Sample.Elasticsearch.Domain.Applications
                     || new QueryContainerDescriptor<IndexActors>().Term(w => w.Age, numero)
                     || new QueryContainerDescriptor<IndexActors>().Term(w => w.TotalMovies, numero);
 
-            var result = _elasticClient.Search<IndexActors>(s => s
-                .Index(nameof(IndexActors).ToLower())
-                .Query(s => query)
-                .Size(10)
-                .Sort(q => q.Descending(p => p.BirthDate)))?.Documents;
+            var result = await _actorsRepository.SearchAsync(_ => query);
 
             return result?.ToList();
         }
 
-        public ActorsAggregationModel GetActorsAggregation()
+        public async Task<ActorsAggregationModel> GetActorsAggregation()
         {
             var query = new QueryContainerDescriptor<IndexActors>().Bool(b => b.Must(m => m.Exists(e => e.Field(f => f.Description))));
 
-            var result = _elasticClient.Search<IndexActors>(s => s
-                .Index(nameof(IndexActors).ToLower())
-                .Query(s => query)
-                .Aggregations(a => a.Sum("TotalAge", sa => sa.Field(o => o.Age))
-                            .Sum("TotalMovies", sa => sa.Field(p => p.TotalMovies))
-                            .Average("AvAge", sa => sa.Field(p => p.Age))
-                        ));
+            var result = await _actorsRepository.SearchAsync(_ => query, a =>
+                        a.Sum("TotalAge", sa => sa.Field(o => o.Age))
+                        .Sum("TotalMovies", sa => sa.Field(p => p.TotalMovies))
+                        .Average("AvAge", sa => sa.Field(p => p.Age)));
 
             var totalAge = NestExtensions.ObterBucketAggregationDouble(result.Aggregations, "TotalAge");
             var totalMovies = NestExtensions.ObterBucketAggregationDouble(result.Aggregations, "TotalMovies");

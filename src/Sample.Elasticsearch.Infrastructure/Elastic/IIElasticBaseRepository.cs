@@ -13,9 +13,9 @@ namespace Sample.Elasticsearch.Infrastructure.Elastic
         Task<T> FindAsync(IGetRequest request);
         Task<IEnumerable<T>> GetAllAsync();
         Task<IEnumerable<T>> GetManyAsync(IEnumerable<string> ids);
-        Task<IEnumerable<T>> SearchAsync(ISearchRequest request);
         Task<IEnumerable<T>> SearchAsync(Func<SearchDescriptor<T>, ISearchRequest> selector);
-        Task<T> SearchByFieldAsync(Func<QueryContainerDescriptor<T>, QueryContainer> request);
+        Task<IEnumerable<T>> SearchAsync(Func<QueryContainerDescriptor<T>, QueryContainer> request);
+        Task<ISearchResponse<T>> SearchAsync(Func<QueryContainerDescriptor<T>, QueryContainer> request, Func<AggregationContainerDescriptor<T>, IAggregationContainer> aggregationsSelector);
         Task<IEnumerable<T>> SearchInAllFields(string term);
         Task<bool> CreateIndexAsync();
         Task<bool> InsertAsync(T t);
