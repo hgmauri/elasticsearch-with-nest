@@ -44,6 +44,13 @@ namespace Sample.Elasticsearch.WebApi.Controllers
             return Json(result);
         }
 
+        [HttpGet("name-multimatch")]
+        public IActionResult GetByNameAndDescriptionMultiMatch([FromQuery] string term)
+        {
+            var result = _actorsApplication.GetByNameAndDescriptionMultiMatch(term);
+
+            return Json(result);
+        }
 
         [HttpGet("name-matchphrase")]
         public IActionResult GetByNameWithMatchPhrase([FromQuery] string name)

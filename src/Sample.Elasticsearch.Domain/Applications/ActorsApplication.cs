@@ -98,6 +98,20 @@ namespace Sample.Elasticsearch.Domain.Applications
             return result?.ToList();
         }
 
+        public async Task<ICollection<IndexActors>> GetByNameAndDescriptionMultiMatch(string term)
+        {
+            var query = new QueryContainerDescriptor<IndexActors>()
+                .MultiMatch(p => p.
+                    Fields(p => p.
+                        Field(f => f.Name).
+                        Field(d => d.Description)).
+                    Query(term));
+
+            var result = await _actorsRepository.SearchAsync(_ => query);
+
+            return result?.ToList();
+        }
+
         public async Task<ICollection<IndexActors>> GetActorsCondition(string name, string description, DateTime? birthdate)
         {
             QueryContainer query = new QueryContainerDescriptor<IndexActors>();

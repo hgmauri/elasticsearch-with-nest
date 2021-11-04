@@ -12,6 +12,7 @@ namespace Sample.Elasticsearch.Domain.Interfaces
         Task<ICollection<IndexActors>> GetAllAsync();
         Task<ICollection<IndexActors>> GetByNameWithTerm(string name);
         Task<ICollection<IndexActors>> GetByNameWithMatch(string name);
+        Task<ICollection<IndexActors>> GetByNameAndDescriptionMultiMatch(string term);
         Task<ICollection<IndexActors>> GetByNameWithMatchPhrase(string name);
         Task<ICollection<IndexActors>> GetByNameWithMatchPhrasePrefix(string name);
         Task<ICollection<IndexActors>> GetByNameWithWildcard(string name);
