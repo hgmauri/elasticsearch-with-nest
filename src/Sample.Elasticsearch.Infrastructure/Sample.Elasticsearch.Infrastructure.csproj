@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Serilog" Version="2.10.0" />
-		<PackageReference Include="NEST" Version="7.15.2" />
+		<PackageReference Include="NEST" Version="7.16.0" />
 	</ItemGroup>
 
 </Project>

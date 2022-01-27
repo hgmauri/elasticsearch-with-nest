@@ -1,48 +1,27 @@
-using System;
-using System.IO;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Sample.Elasticsearch.WebApi.Core.Extensions;
 using Serilog;
 
-namespace Sample.Elasticsearch.WebApi
-{
-    public class Program
-    {
-        public static IConfiguration Configuration { get; } = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
-            .AddEnvironmentVariables()
-            .Build();
+var builder = WebApplication.CreateBuilder(args);
+SerilogExtensions.AddSerilog(builder.Configuration);
+builder.Host.UseSerilog(Log.Logger);
 
-        public static void Main(string[] args)
-        {
-            SerilogExtensions.AddSerilog(Configuration);
+builder.Services.AddApiConfiguration();
 
-            try
-            {
-                Log.Information("Getting the motors running...");
+builder.Services.AddElasticsearch(builder.Configuration);
+builder.Services.AddSwagger(builder.Configuration);
 
-                CreateHostBuilder(args).Build().Run();
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "Host terminated unexpectedly");
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
-        }
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseSerilog()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
-}
+var app = builder.Build();
+
+app.UseApiConfiguration(app.Environment);
+
+app.UseSwaggerDoc();
+
+app.MapControllers();
+
+app.Run();
+
