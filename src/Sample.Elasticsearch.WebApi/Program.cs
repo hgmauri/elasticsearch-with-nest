@@ -24,4 +24,3 @@ app.UseSwaggerDoc();
 app.MapControllers();
 
 app.Run();
-

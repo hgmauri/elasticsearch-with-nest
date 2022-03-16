@@ -4,44 +4,43 @@ using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Sample.Elasticsearch.WebApi.Core.Middleware
+namespace Sample.Elasticsearch.WebApi.Core.Middleware;
+
+public class ErrorHandlingMiddleware
 {
-    public class ErrorHandlingMiddleware
+    private readonly RequestDelegate next;
+
+    public ErrorHandlingMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate next;
+        this.next = next;
+    }
 
-        public ErrorHandlingMiddleware(RequestDelegate next)
+    public async Task Invoke(HttpContext context)
+    {
+        try
         {
-            this.next = next;
+            await next(context);
         }
-
-        public async Task Invoke(HttpContext context)
+        catch (Exception ex)
         {
-            try
-            {
-                await next(context);
-            }
-            catch (Exception ex)
-            {
-                await HandleExceptionAsync(context, ex);
-            }
+            await HandleExceptionAsync(context, ex);
         }
+    }
 
-        private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        Log.Error(exception, "Erro não tratado");
+
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+        var result = JsonSerializer.Serialize(new { error = exception?.Message }, new JsonSerializerOptions()
         {
-            Log.Error(exception, "Erro não tratado");
+            WriteIndented = true,
+            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
 
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
-            var result = JsonSerializer.Serialize(new { error = exception?.Message }, new JsonSerializerOptions()
-            {
-                WriteIndented = true,
-                DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
-
-            await context.Response.WriteAsync(result);
-        }
+        await context.Response.WriteAsync(result);
     }
 }
