@@ -21,8 +21,10 @@ public static class ElasticsearchExtensions
         if (!string.IsNullOrEmpty(basicAuthUser) && !string.IsNullOrEmpty(basicAuthPassword))
             settings = settings.BasicAuthentication(basicAuthUser, basicAuthPassword);
 
-        var client = new ElasticClient(settings);
+        settings.EnableApiVersioningHeader();
 
+        var client = new ElasticClient(settings);
+        
         services.AddSingleton<IElasticClient>(client);
     }
 }

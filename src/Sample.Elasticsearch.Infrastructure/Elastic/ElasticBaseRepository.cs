@@ -149,10 +149,12 @@ public abstract class ElasticBaseRepository<T> : IElasticBaseRepository<T> where
 
     public async Task<bool> InsertManyAsync(IList<T> tList)
     {
+        await CreateIndexAsync();
         var response = await _elasticClient.IndexManyAsync(tList, IndexName);
 
         if (!response.IsValid)
             throw new Exception(response.ServerError?.ToString(), response.OriginalException);
+
 
         return true;
     }

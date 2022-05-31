@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Elastic.Apm.SerilogEnricher;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
@@ -20,16 +21,19 @@ public static class SerilogExtensions
             .Enrich.FromLogContext()
             .Enrich.WithMachineName()
             .Enrich.WithEnvironmentUserName()
-            .WriteTo.Debug()
+            .Enrich.WithElasticApmCorrelationInfo()
             .Filter.ByExcluding(Matching.FromSource("Microsoft.AspNetCore.StaticFiles"))
             .Filter.ByExcluding(z => z.MessageTemplate.Text.Contains("specific error"))
-            .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["ElasticsearchSettings:uri"]))
+            .WriteTo.Async(writeTo => writeTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["ElasticsearchSettings:uri"]))
             {
+                TypeName = null,
                 AutoRegisterTemplate = true,
                 IndexFormat = "indexlogs",
+                BatchAction = ElasticOpType.Create,
                 ModifyConnectionSettings = x => x.BasicAuthentication(configuration["ElasticsearchSettings:username"], configuration["ElasticsearchSettings:password"])
-            })
-            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
+            }))
+            .WriteTo.Async(writeTo => writeTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}"))
+            .WriteTo.Debug()
             .CreateLogger();
     }
 
