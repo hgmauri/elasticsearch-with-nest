@@ -8,3 +8,5 @@
 - Exception Middleware
 
 https://henriquemauri.net/escrevendo-queries-no-elasticsearch-utilizando-net-e-nest/
+
+https://henriquemauri.net/centralizando-logs-com-elastic-stack-e-net-parte-1-docker/
