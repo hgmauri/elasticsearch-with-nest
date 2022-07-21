@@ -5,7 +5,7 @@
 - NEST
 - Serilog
 - Elasticsearch Repository
-- Exception Middleware
+- Middlewares
 
 https://henriquemauri.net/escrevendo-queries-no-elasticsearch-utilizando-net-e-nest/
 
