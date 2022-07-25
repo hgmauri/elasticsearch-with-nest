@@ -1,5 +1,4 @@
 using System;
-using Elastic.Apm.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Sample.Elasticsearch.WebApi.Core.Extensions;
@@ -8,8 +7,8 @@ using Serilog;
 try
 {
     var builder = WebApplication.CreateBuilder(args);
-    SerilogExtensions.AddSerilog(builder.Configuration);
-    builder.Host.UseSerilog(Log.Logger);
+    builder.AddSerilog(builder.Configuration, "API Elasticsearch");
+    Log.Information("Starting API");
 
     builder.Services.AddApiConfiguration();
 
