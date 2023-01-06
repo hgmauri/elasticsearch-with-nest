@@ -1,6 +1,7 @@
-# Elasticsearch with NEST in .NET 6.0
+# Elasticsearch with NEST in .NET 7.0
+
 - Docker
-- .NET 6.0
+- .NET 7.0
 - Swashbuckle Swagger
 - NEST
 - Serilog
